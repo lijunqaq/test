@@ -1,0 +1,36 @@
+#server:
+#    port: 8080
+#spring:
+#    profiles:
+#        active: dev
+#    redis:
+#        database: 0
+#        timeout: 3000ms
+#        pool:
+#            max-active: 100
+#            max-idle: 50
+#            max-wait: 1000
+#            min-idle: 10
+#        sentinel:
+#            master: mymaster
+#            nodes: 39.108.140.201:26379
+
+
+#集群
+server:
+    port: 8081
+spring:
+    profiles:
+        active: dev
+    redis:
+        database: 0
+        timeout: 3000ms
+        password: lijun
+        cluster:
+            nodes: 192.168.48.132:8001,192.168.48.132:8002,192.168.48.132:8003,192.168.48.132:8004,192.168.48.132:8005,192.168.48.132:8006
+        lettuce:
+          pool:
+            max-active: 100
+            max-idle: 50
+            max-wait: 1000ms
+            min-idle: 10

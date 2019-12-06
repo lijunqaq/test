@@ -3,7 +3,7 @@ package com.lj.schedule;
 import java.util.concurrent.*;
 
 /**
- * 功能描述
+ * 定时线程池api使用
  *
  * @author Lj
  * @date 2019/12/5
@@ -35,15 +35,20 @@ public class ScheduleTest {
 
 
         /**
-         * 这个会等待上个任务结束 经过间隔时间（3s） 才会产生任务
+         * 这个会等待上个任务结束 经过间隔时间（3s） 才会产生任务  如果执行任务耗时3s 则每6s产生一个任务
          */
         pool.scheduleWithFixedDelay(new Runnable() {
             @Override
             public void run() {
-                System.out.println("重复执行s");
+                System.out.println("重复执行等待s");
+                try {
+                    Thread.sleep(3000L);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
         },1,3,TimeUnit.SECONDS);
 
-        pool.shutdown();
+      pool.shutdown();
     }
 }

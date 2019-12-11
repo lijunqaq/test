@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<configuration debug="true" scan="true" scanPeriod="10 seconds">
+
+    <conversionRule conversionWord="clr" converterClass="org.springframework.boot.logging.logback.ColorConverter"/>
+    <conversionRule conversionWord="wex"
+                    converterClass="org.springframework.boot.logging.logback.WhitespaceThrowableProxyConverter"/>
+    <conversionRule conversionWord="wEx"
+                    converterClass="org.springframework.boot.logging.logback.ExtendedWhitespaceThrowableProxyConverter"/>
+
+    <springProperty name="appName" source="spring.application.name" defaultValue="phl-new-front" />
+
+    <!--application.yml 传递参数，不能使用logback 自带的<property>标签 -->
+    <property name="LOG_PATH" value="/home/data/logs"/>
+    <property name="LOG_FILE" value="${appName}"/>
+    <property name="CONSOLE_LOG_PATTERN" value="%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(${LOG_LEVEL_PATTERN:-%5p}) %clr(${PID:- }){magenta} %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}"/>
+    <property name="FILE_LOG_PATTERN" value="%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(${LOG_LEVEL_PATTERN:-%5p}) %clr(${PID:- }){magenta} %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}"/>
+
+
+    <!--输出到控制台 ConsoleAppender-->
+    <appender name="CONSOLE_APPENDER" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>${CONSOLE_LOG_PATTERN}</pattern>
+            <charset>utf8</charset>
+            <outputPatternAsHeader>true</outputPatternAsHeader>
+        </encoder>
+    </appender>
+
+    <appender name="ROLLING_APPENDER" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <File>${LOG_PATH}/${LOG_FILE}.log</File>
+        <encoder>
+            <pattern>${FILE_LOG_PATTERN}</pattern>
+            <immediateFlush>false</immediateFlush>
+            <outputPatternAsHeader>true</outputPatternAsHeader>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_PATH}/${LOG_FILE}.%d{yyyy-MM-dd}</fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+    </appender>
+
+    <appender name="ASYNC_ROLLING_APPENDER" class="ch.qos.logback.classic.AsyncAppender">
+        <!-- 不丢失日志.默认的,如果队列的80%已满,则会丢弃TRACT、DEBUG、INFO级别的日志 -->
+        <discardingThreshold>100</discardingThreshold>
+        <!-- 更改默认的队列的深度,该值会影响性能.默认值为256 -->
+        <queueSize>512</queueSize>
+        <!-- 添加附加的appender,最多只能添加一个 -->
+        <appender-ref ref="ROLLING_APPENDER"/>
+    </appender>
+
+
+    <appender name="ERROR_APPENDER" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>WARN</level>
+        </filter>
+
+        <encoder>
+            <pattern>${FILE_LOG_PATTERN}</pattern>
+        </encoder>
+        <File>${LOG_PATH}/${LOG_FILE}_error.log</File>
+
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_PATH}/${LOG_FILE}_error.log.%d{yyyy-MM-dd}</fileNamePattern>
+        </rollingPolicy>
+    </appender>
+
+
+    <springProfile name="dev,beta,demo">
+
+        <logger name="com.lj.excel.mapper" level="debug" additivity="false">
+            <appender-ref ref="CONSOLE_APPENDER"/>
+            <appender-ref ref="ROLLING_APPENDER"/>
+            <appender-ref ref="ERROR_APPENDER"/>
+        </logger>
+
+        <logger name="com.lj.excel" level="debug" additivity="false">
+            <appender-ref ref="CONSOLE_APPENDER"/>
+            <appender-ref ref="ROLLING_APPENDER"/>
+            <appender-ref ref="ERROR_APPENDER"/>
+        </logger>
+
+        <logger name="org.springframework.boot" level="INFO" additivity="false">
+            <appender-ref ref="CONSOLE_APPENDER"/>
+            <appender-ref ref="ROLLING_APPENDER"/>
+            <appender-ref ref="ERROR_APPENDER"/>
+        </logger>
+    </springProfile>
+
+
+    <springProfile name="prodyn">
+
+        <logger name="com.lj.excel.mapper" level="debug" additivity="false">
+            <appender-ref ref="CONSOLE_APPENDER"/>
+            <appender-ref ref="ROLLING_APPENDER"/>
+            <appender-ref ref="ERROR_APPENDER"/>
+        </logger>
+        <logger name="com.ybs.phl.front" level="INFO" additivity="false">
+            <appender-ref ref="ROLLING_APPENDER"/>
+            <appender-ref ref="ERROR_APPENDER"/>
+        </logger>
+
+        <logger name="org.springframework.boot" level="INFO" additivity="false">
+            <appender-ref ref="ERROR_APPENDER"/>
+            <appender-ref ref="ROLLING_APPENDER"/>
+        </logger>
+
+    </springProfile>
+
+    <springProfile name="prodgd">
+
+        <logger name="com.ybs.phl.front" level="INFO" additivity="false">
+            <appender-ref ref="ROLLING_APPENDER"/>
+            <appender-ref ref="ERROR_APPENDER"/>
+        </logger>
+
+        <logger name="org.springframework.boot" level="INFO" additivity="false">
+            <appender-ref ref="ROLLING_APPENDER"/>
+            <appender-ref ref="ERROR_APPENDER"/>
+        </logger>
+
+    </springProfile>
+
+    <root level="INFO">
+        <appender-ref ref="CONSOLE_APPENDER"/>
+        <appender-ref ref="ROLLING_APPENDER"/>
+        <appender-ref ref="ERROR_APPENDER"/>
+    </root>
+
+</configuration>

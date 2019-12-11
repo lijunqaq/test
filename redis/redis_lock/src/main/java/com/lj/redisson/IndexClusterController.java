@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * 功能描述
+ * 基于redission的分布式锁
  *
  * @author Lj
  * @date 2019/10/21
@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class IndexClusterController {
 
-    private static final Logger logger = LoggerFactory.getLogger(IndexClusterController.class);
+    private static final Logger log = LoggerFactory.getLogger(IndexClusterController.class);
 
     @Autowired
     private Redisson redisson;
@@ -43,6 +43,7 @@ public class IndexClusterController {
                 stringRedisTemplate.opsForValue().set(rediskey, realstock.toString());
                 System.out.println("扣减成功，剩余库存：" + realstock + "");
             } else {
+                log.info("扣减失败，库存不足");
                 System.out.println("扣减失败，库存不足");
             }
         }finally {
